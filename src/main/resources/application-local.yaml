@@ -1,0 +1,30 @@
+# Local development profile. Do NOT use in production.
+# Start a local PostgreSQL with a `magnus` database first, e.g.:
+#   createdb magnus
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/magnus
+    username: magnus
+    password: ${LOCAL_DB_PASSWORD:magnus}
+  flyway:
+    clean-disabled: false
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
+
+app:
+  storage:
+    root: ${LOCAL_STORAGE_ROOT:./data/app-data}
+  admin:
+    username: admin
+
+# Local-only default admin credential: BCrypt of "test-password".
+# Production MUST override via the configtree secret `magnus_admin_password-hash`.
+magnus_admin_password-hash: ${LOCAL_ADMIN_PASSWORD_HASH:$2a$10$ATnjoX1UTbvzMkbgwYoG9OtjHT/ZE2PpuiYSxojxUeYdRDaij9XHi}
+
+logging:
+  level:
+    com.hubc.magnusblog: debug

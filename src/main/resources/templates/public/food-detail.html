@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${content.title}">菜谱</title>
+</head>
+<body>
+<section class="detail-page">
+    <header th:replace="~{fragments/content-detail :: detailHeader(${content})}"></header>
+    <section th:replace="~{fragments/content-detail :: foodBody(${content})}"></section>
+    <p class="back-link"><a th:href="@{/life/food}">← 返回菜谱列表</a></p>
+</section>
+</body>
+</html>

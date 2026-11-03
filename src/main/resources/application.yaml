@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: magnus-blog
+  config:
+    import: "optional:configtree:/run/secrets/"
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/magnus}
+    username: ${SPRING_DATASOURCE_USERNAME:magnus}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+  threads:
+    virtual:
+      enabled: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:true}
+
+app:
+  storage:
+    root: ${APP_STORAGE_ROOT:/var/lib/magnus}
+    min-free-bytes: ${APP_STORAGE_MIN_FREE_BYTES:104857600}
+  admin:
+    username: ${APP_ADMIN_USERNAME:}
+  upload:
+    max-pixels: 10000000
+    max-width: 12000
+    max-height: 12000
+    concurrent-jobs: 2
+  site:
+    base-url: ${APP_SITE_BASE_URL:http://localhost:8080}
+
+logging:
+  level:
+    root: info
+    com.hubc.magnusblog: info

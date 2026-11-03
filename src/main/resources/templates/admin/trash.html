@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/admin-layout :: layout(~{::title}, ~{::section}, ~{})}">
+<head>
+    <meta charset="UTF-8">
+    <title>回收站 · Magnus 后台</title>
+</head>
+<body>
+<section>
+    <h1>回收站</h1>
+    <table class="admin-table" th:if="${!#lists.isEmpty(page.content)}">
+        <thead>
+        <tr><th>标题</th><th>类型</th><th>删除时间</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${page.content}">
+            <td th:text="${row.title != null and !row.title.isBlank()} ? ${row.title} : '（无标题）'"></td>
+            <td th:text="${row.type}"></td>
+            <td th:text="${@fmt.dateTime(row.updatedAt)}"></td>
+            <td>
+                <form th:action="@{/admin/contents/{id}/restore(id=${row.id})}" method="post"
+                      data-confirm="恢复为草稿？不会自动发布。" class="inline-form">
+                    <input type="hidden" name="entryVersion" th:value="${row.entryVersion}">
+                    <button type="submit" class="btn">恢复为草稿</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty-state" th:if="${#lists.isEmpty(page.content)}">回收站是空的。</p>
+    <nav th:replace="~{fragments/pagination :: pager(${page}, '/admin/trash', ${type != null and !type.isBlank() ? '&type=' + type : ''})}"></nav>
+</section>
+</body>
+</html>

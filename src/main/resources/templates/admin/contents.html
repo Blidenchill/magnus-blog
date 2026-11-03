@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/admin-layout :: layout(~{::title}, ~{::section}, ~{})}">
+<head>
+    <meta charset="UTF-8">
+    <title>内容管理 · Magnus 后台</title>
+</head>
+<body>
+<section>
+    <div class="admin-page-head">
+        <h1>内容管理</h1>
+        <a class="btn btn-primary" th:href="@{/admin/contents/new}">＋ 新建内容</a>
+    </div>
+    <form class="filter-bar" th:action="@{/admin/contents}" method="get">
+        <select name="type" aria-label="类型">
+            <option value="" th:selected="${type == null or type.isBlank()}">全部类型</option>
+            <option value="PHOTO" th:selected="${type == 'PHOTO'}">相册</option>
+            <option value="BLOG" th:selected="${type == 'BLOG'}">Blog</option>
+            <option value="FOOD" th:selected="${type == 'FOOD'}">菜谱</option>
+            <option value="TRAVEL" th:selected="${type == 'TRAVEL'}">旅行</option>
+        </select>
+        <select name="status" aria-label="状态">
+            <option value="ALL" th:selected="${status == 'ALL'}">全部状态</option>
+            <option value="PUBLISHED" th:selected="${status == 'PUBLISHED'}">已发布</option>
+            <option value="DRAFT" th:selected="${status == 'DRAFT'}">草稿</option>
+        </select>
+        <button type="submit" class="btn">筛选</button>
+    </form>
+    <table class="admin-table" th:if="${!#lists.isEmpty(page.content)}">
+        <thead>
+        <tr><th>标题</th><th>类型</th><th>状态</th><th>发布日期</th><th>更新于</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${page.content}">
+            <td>
+                <a th:href="@{/admin/contents/{id}/edit(id=${row.id})}"
+                   th:text="${row.title != null and !row.title.isBlank()} ? ${row.title} : '（无标题）'"></a>
+            </td>
+            <td th:text="${row.type}"></td>
+            <td><span class="chip" th:classappend="${row.status == '已发布'} ? 'chip-ok' : ''"
+                      th:text="${row.status}"></span></td>
+            <td th:text="${@fmt.date(row.firstPublishedAt)}"></td>
+            <td th:text="${@fmt.dateTime(row.updatedAt)}"></td>
+            <td>
+                <a th:href="@{/admin/contents/{id}/edit(id=${row.id})}">编辑</a>
+                <a th:href="@{/admin/contents/{id}/preview(id=${row.id})}" target="_blank" rel="noopener">预览</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty-state" th:if="${#lists.isEmpty(page.content)}">暂无内容，点击“新建内容”开始。</p>
+    <nav th:replace="~{fragments/pagination :: pager(${page}, '/admin/contents', ${(type != null and !type.isBlank() ? '&type=' + type : '') + (status != null ? '&status=' + status : '')})}"></nav>
+</section>
+</body>
+</html>

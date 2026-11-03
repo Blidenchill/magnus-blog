@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Shared header for a detail page -->
+<header th:fragment="detailHeader(content)" class="detail-header">
+    <h1 th:text="${content.title}">标题</h1>
+    <div class="detail-meta">
+        <time th:if="${content.publishedAt != null}" th:text="${@fmt.date(content.publishedAt)}"></time>
+        <span class="chip" th:if="${content.category != null}" th:text="${content.category}"></span>
+        <span class="chip chip-tag" th:each="t : ${content.tags}" th:text="${t}"></span>
+    </div>
+    <p class="detail-summary" th:if="${content.summary != null}" th:text="${content.summary}"></p>
+    <figure class="detail-cover" th:if="${content.coverDisplayUrl != null}">
+        <img th:src="${content.coverDisplayUrl}" th:alt="${content.title}" loading="lazy">
+    </figure>
+</header>
+
+<!-- PHOTO album body -->
+<section th:fragment="photoBody(content)" class="photo-body">
+    <p class="richtext" th:if="${content.bodyHtml != null}" th:utext="${content.bodyHtml}"></p>
+    <ul class="photo-list">
+        <li th:each="photo : ${content.photos}">
+            <figure>
+                <img th:src="${photo.displayUrl}" th:alt="${photo.altText ?: content.title}"
+                     loading="lazy" class="zoomable">
+                <figcaption th:if="${photo.caption != null}" th:text="${photo.caption}"></figcaption>
+            </figure>
+        </li>
+    </ul>
+</section>
+
+<!-- BLOG body -->
+<article th:fragment="blogBody(content)" class="article-body">
+    <div class="richtext" th:utext="${content.bodyHtml}"></div>
+</article>
+
+<!-- FOOD recipe body -->
+<section th:fragment="foodBody(content)" class="recipe-body">
+    <div class="recipe-facts" th:if="${content.recipe != null}">
+        <span class="chip" th:if="${content.recipe.difficulty != null}"
+              th:text="|难度：${content.recipe.difficulty}|"></span>
+        <span class="chip" th:if="${content.recipe.durationMinutes != null}"
+              th:text="|用时 ${content.recipe.durationMinutes} 分钟|"></span>
+        <span class="chip" th:if="${content.recipe.servings != null}"
+              th:text="|份量 ${content.recipe.servings}|"></span>
+    </div>
+    <p class="detail-summary" th:if="${content.recipe != null and content.recipe.intro != null}"
+       th:text="${content.recipe.intro}"></p>
+    <div class="richtext" th:if="${content.bodyHtml != null}" th:utext="${content.bodyHtml}"></div>
+
+    <h2 th:if="${!#lists.isEmpty(content.ingredients)}">食材</h2>
+    <ul class="ingredient-list" th:if="${!#lists.isEmpty(content.ingredients)}">
+        <li th:each="ing : ${content.ingredients}">
+            <span class="ing-name" th:text="${ing.name}"></span>
+            <span class="ing-amount" th:text="${ing.amount}"></span>
+        </li>
+    </ul>
+
+    <h2 th:if="${!#lists.isEmpty(content.steps)}">制作步骤</h2>
+    <ol class="step-list" th:if="${!#lists.isEmpty(content.steps)}">
+        <li th:each="step : ${content.steps}">
+            <p th:if="${step.text != null}" th:text="${step.text}"></p>
+            <img th:if="${step.displayUrl != null}" th:src="${step.displayUrl}"
+                 th:alt="${step.altText ?: '步骤图'}" loading="lazy" class="zoomable">
+        </li>
+    </ol>
+</section>
+
+<!-- TRAVEL body -->
+<section th:fragment="travelBody(content)" class="travel-body">
+    <div class="richtext" th:if="${content.bodyHtml != null}" th:utext="${content.bodyHtml}"></div>
+    <ol class="destination-list">
+        <li th:each="dest : ${content.destinations}" class="destination">
+            <h2 th:text="${dest.name}"></h2>
+            <div class="detail-meta">
+                <span class="chip" th:if="${dest.region != null}" th:text="${dest.region}"></span>
+                <time th:if="${dest.visitDate != null}" th:text="${@fmt.date(dest.visitDate)}"></time>
+                <a th:if="${dest.mapUrl != null}" th:href="${dest.mapUrl}" target="_blank"
+                   rel="nofollow noopener noreferrer" class="map-link">查看地图 ↗</a>
+            </div>
+            <p th:if="${dest.summary != null}" th:text="${dest.summary}"></p>
+            <blockquote th:if="${dest.recommendReason != null}">
+                <p th:text="${dest.recommendReason}"></p>
+            </blockquote>
+            <img th:if="${dest.displayUrl != null}" th:src="${dest.displayUrl}"
+                 th:alt="${dest.altText ?: dest.name}" loading="lazy" class="zoomable">
+        </li>
+    </ol>
+</section>
+
+</body>
+</html>

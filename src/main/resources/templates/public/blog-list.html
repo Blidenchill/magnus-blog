@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog</title>
+</head>
+<body>
+<section>
+    <h1>Blog</h1>
+    <div class="filter-bar" th:if="${tag != null}">
+        <span>标签筛选：</span><span class="chip chip-tag" th:text="${tag}"></span>
+        <a th:href="@{/blog}">清除</a>
+    </div>
+    <div class="post-list" th:if="${!#lists.isEmpty(page.content)}">
+        <article class="post-item" th:each="post : ${page.content}">
+            <h2><a th:href="@{/blog/{slug}(slug=${post.slug})}" th:text="${post.title}">标题</a></h2>
+            <p class="card-summary" th:if="${post.summary != null}" th:text="${post.summary}"></p>
+            <div class="card-meta">
+                <time th:if="${post.publishedAt != null}" th:text="${@fmt.date(post.publishedAt)}"></time>
+                <a class="chip chip-tag" th:each="t : ${post.tags}"
+                   th:href="@{/blog(tag=${t})}" th:text="${t}"></a>
+            </div>
+        </article>
+    </div>
+    <p class="empty-state" th:if="${#lists.isEmpty(page.content)}">还没有公开的文章</p>
+    <nav th:replace="~{fragments/pagination :: pager(${page}, '/blog', ${tag != null ? '&tag=' + tag : ''})}"></nav>
+</section>
+</body>
+</html>

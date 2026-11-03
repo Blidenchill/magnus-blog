@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/admin-layout :: layout(~{::title}, ~{::section}, ~{::link})}">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑内容 · Magnus 后台</title>
+    <link rel="stylesheet" th:href="@{/vendor/quill/quill.snow.css}">
+</head>
+<body>
+<section th:data-type="${view.entry.type.name()}">
+    <div class="admin-page-head">
+        <h1>
+            编辑
+            <span class="chip" th:text="${view.entry.type}"></span>
+            <span class="chip chip-ok" th:if="${view.entry.publishedRevisionId != null}">已发布</span>
+            <span class="chip" th:unless="${view.entry.publishedRevisionId != null}">草稿</span>
+        </h1>
+        <div class="head-actions">
+            <a class="btn" th:href="@{/admin/contents/{id}/preview(id=${view.entry.id})}"
+               target="_blank" rel="noopener">预览</a>
+        </div>
+    </div>
+
+    <div th:if="${errors != null and !errors.isEmpty()}" class="flash flash-error">
+        <p th:if="${errors.containsKey('_')}" th:text="${errors.get('_')}"></p>
+        <ul th:unless="${errors.containsKey('_') and errors.size() == 1}">
+            <li th:each="e : ${errors}" th:if="${e.key != '_'}" th:text="${e.value}"></li>
+        </ul>
+    </div>
+
+    <form id="content-form" th:action="@{/admin/contents/{id}/edit(id=${view.entry.id})}" method="post">
+        <input type="hidden" name="entryVersion" th:value="${view.entry.version}">
+        <input type="hidden" name="revisionVersion" th:value="${view.draft.version}">
+        <input type="hidden" name="detailJson" id="detailJson">
+        <input type="hidden" name="coverMediaId" id="coverMediaId" th:value="${view.draft.coverMediaId}">
+
+        <div class="field">
+            <label for="title">标题 <span class="required">*</span></label>
+            <input type="text" id="title" name="title" th:value="${view.draft.title}"
+                   maxlength="120" placeholder="最多 120 个字符">
+        </div>
+
+        <div class="field">
+            <label for="slug">地址标识（slug）</label>
+            <input type="text" id="slug" name="slug" th:value="${view.entry.slug}"
+                   th:readonly="${view.entry.firstPublishedAt != null}" maxlength="80">
+            <p class="field-hint" th:if="${view.entry.firstPublishedAt == null}">小写字母、数字和连字符；首次发布后固定。</p>
+            <p class="field-hint" th:unless="${view.entry.firstPublishedAt == null}">已发布内容不可修改地址标识。</p>
+        </div>
+
+        <div class="field">
+            <label for="summary">简介 / 摘要</label>
+            <textarea id="summary" name="summary" rows="2" maxlength="500" th:text="${view.draft.summary}"></textarea>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label for="category">分类</label>
+                <input type="text" id="category" name="category" th:value="${view.draft.category}" maxlength="60">
+            </div>
+            <div class="field">
+                <label for="tags">标签（逗号分隔，最多 8 个）</label>
+                <input type="text" id="tags" name="tags" th:value="${#strings.setJoin(view.draft.tags, ', ')}">
+            </div>
+        </div>
+
+        <div class="field checkbox-field">
+            <label><input type="checkbox" name="featured" value="true" th:checked="${view.draft.featured}"> 设为精选（主页优先展示）</label>
+        </div>
+
+        <div class="field">
+            <label>封面图</label>
+            <div class="cover-slot">
+                <img id="coverPreview" th:if="${view.detail.coverDisplayUrl != null}"
+                     th:src="${view.detail.coverDisplayUrl}" alt="封面预览">
+                <button type="button" class="btn" data-upload-for="cover">上传封面</button>
+                <button type="button" class="btn btn-quiet" data-clear-cover>移除</button>
+            </div>
+        </div>
+
+        <!-- BLOG: rich text body -->
+        <div class="field" th:if="${view.entry.type.name() == 'BLOG'}">
+            <label>正文 <span class="required">*</span></label>
+            <div id="quill-editor" class="quill-editor"></div>
+            <input type="hidden" name="bodyHtml" id="bodyHtml" th:value="${view.draft.bodyHtml}">
+        </div>
+
+        <!-- PHOTO: album items -->
+        <div class="field" th:if="${view.entry.type.name() == 'PHOTO'}">
+            <label>相册图片 <span class="required">*</span>（最多 15 张，拖拽调整顺序）</label>
+            <ul id="photo-items" class="edit-list"></ul>
+            <button type="button" class="btn" data-upload-for="photo">＋ 添加图片</button>
+            <input type="hidden" name="bodyHtml" th:value="${view.draft.bodyHtml}">
+        </div>
+
+        <!-- FOOD: recipe -->
+        <th:block th:if="${view.entry.type.name() == 'FOOD'}">
+            <div class="field-row">
+                <div class="field">
+                    <label for="difficulty">难度</label>
+                    <select id="difficulty" name="difficultyIgnored" data-detail-field="difficulty">
+                        <option value="">未设置</option>
+                        <option value="简单">简单</option>
+                        <option value="中等">中等</option>
+                        <option value="困难">困难</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="duration">制作时间（分钟）</label>
+                    <input type="number" id="duration" min="0" max="100000" data-detail-field="durationMinutes">
+                </div>
+                <div class="field">
+                    <label for="servings">份量</label>
+                    <input type="text" id="servings" maxlength="30" data-detail-field="servings" placeholder="如：2 人份">
+                </div>
+            </div>
+            <div class="field">
+                <label for="intro">菜谱简介</label>
+                <textarea id="intro" rows="3" data-detail-field="intro"></textarea>
+            </div>
+            <div class="field">
+                <label>食材</label>
+                <ul id="ingredient-items" class="edit-list"></ul>
+                <button type="button" class="btn" data-add-row="ingredient">＋ 添加食材</button>
+            </div>
+            <div class="field">
+                <label>制作步骤 <span class="required">*</span></label>
+                <ul id="step-items" class="edit-list"></ul>
+                <button type="button" class="btn" data-add-row="step">＋ 添加步骤</button>
+            </div>
+            <input type="hidden" name="bodyHtml" th:value="${view.draft.bodyHtml}">
+        </th:block>
+
+        <!-- TRAVEL: destinations -->
+        <div class="field" th:if="${view.entry.type.name() == 'TRAVEL'}">
+            <label>景点清单 <span class="required">*</span></label>
+            <ul id="destination-items" class="edit-list"></ul>
+            <button type="button" class="btn" data-add-row="destination">＋ 添加景点</button>
+            <input type="hidden" name="bodyHtml" th:value="${view.draft.bodyHtml}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">保存草稿</button>
+            <span id="autosave-status" class="muted" role="status" aria-live="polite"></span>
+        </div>
+    </form>
+
+    <div class="danger-zone">
+        <form th:action="@{/admin/contents/{id}/publish(id=${view.entry.id})}" method="post" class="inline-form"
+              data-confirm="确认发布？公开页面将立即更新。">
+            <input type="hidden" name="entryVersion" th:value="${view.entry.version}">
+            <input type="hidden" name="revisionVersion" th:value="${view.draft.version}">
+            <button type="submit" class="btn btn-primary">发布</button>
+        </form>
+        <form th:if="${view.entry.publishedRevisionId != null}"
+              th:action="@{/admin/contents/{id}/unpublish(id=${view.entry.id})}" method="post" class="inline-form"
+              data-confirm="撤回后访客将无法访问该内容，确认撤回？">
+            <input type="hidden" name="entryVersion" th:value="${view.entry.version}">
+            <button type="submit" class="btn">撤回发布</button>
+        </form>
+        <form th:action="@{/admin/contents/{id}/trash(id=${view.entry.id})}" method="post" class="inline-form"
+              data-confirm="放入回收站？内容将取消公开，可在回收站恢复。">
+            <input type="hidden" name="entryVersion" th:value="${view.entry.version}">
+            <button type="submit" class="btn btn-danger">放入回收站</button>
+        </form>
+    </div>
+
+    <div id="editor-data" hidden
+         th:data-type="${view.entry.type.name()}"
+         th:data-detail="${detailJson}"
+         th:data-autosave-url="@{/admin/contents/{id}/autosave(id=${view.entry.id})}"></div>
+    <script th:src="@{/vendor/quill/quill.js}"></script>
+    <script th:src="@{/js/content-editor.js}"></script>
+</section>
+</body>
+</html>

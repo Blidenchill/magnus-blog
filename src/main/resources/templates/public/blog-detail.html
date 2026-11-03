@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${content.title}">Blog</title>
+</head>
+<body>
+<section class="detail-page article-page">
+    <header th:replace="~{fragments/content-detail :: detailHeader(${content})}"></header>
+    <article th:replace="~{fragments/content-detail :: blogBody(${content})}"></article>
+    <p class="back-link"><a th:href="@{/blog}">← 返回 Blog 列表</a></p>
+</section>
+</body>
+</html>

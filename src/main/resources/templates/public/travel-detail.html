@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${content.title}">旅行</title>
+</head>
+<body>
+<section class="detail-page">
+    <header th:replace="~{fragments/content-detail :: detailHeader(${content})}"></header>
+    <section th:replace="~{fragments/content-detail :: travelBody(${content})}"></section>
+    <p class="back-link"><a th:href="@{/life/travel}">← 返回旅行列表</a></p>
+</section>
+</body>
+</html>

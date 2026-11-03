@@ -1,0 +1,94 @@
+# Magnus Blog single-host deployment.
+# Prerequisites on the host:
+#   - $DATA_ROOT (e.g. /srv/magnus) is a mounted data disk with postgres/ and app-data/ subdirs
+#   - /etc/magnus/secrets/ contains postgres-bootstrap-password, app-database-password, admin-password-hash
+#   - /etc/magnus/tls/ contains fullchain.pem and privkey.pem
+#   - .env provides DATA_ROOT, APP_IMAGE, APP_ADMIN_USERNAME
+# No service publishes ports to the public except nginx (80/443).
+
+name: magnus
+
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: magnus
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_bootstrap_password
+    secrets:
+      - postgres_bootstrap_password
+    volumes:
+      - type: bind
+        source: ${DATA_ROOT:?DATA_ROOT must be set}/postgres
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d magnus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - internal
+
+  app:
+    image: ${APP_IMAGE:?APP_IMAGE must be set}
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/magnus
+      SPRING_DATASOURCE_USERNAME: magnus
+      SPRING_CONFIG_IMPORT: optional:configtree:/run/secrets/
+      APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME:?APP_ADMIN_USERNAME must be set}
+      APP_STORAGE_ROOT: /var/lib/magnus
+      APP_SITE_BASE_URL: ${APP_SITE_BASE_URL:-https://localhost}
+      SESSION_COOKIE_SECURE: "true"
+    secrets:
+      - source: app_database_password
+        target: spring.datasource.password
+      - source: admin_password_hash
+        target: magnus_admin_password-hash
+    volumes:
+      - type: bind
+        source: ${DATA_ROOT:?DATA_ROOT must be set}/app-data
+        target: /var/lib/magnus
+        bind:
+          create_host_path: false
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:1.27-bookworm
+    volumes:
+      - type: bind
+        source: ${PWD}/deploy/nginx.conf
+        target: /etc/nginx/conf.d/magnus.conf
+        read_only: true
+      - type: bind
+        source: /etc/magnus/tls
+        target: /etc/nginx/tls
+        read_only: true
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+secrets:
+  postgres_bootstrap_password:
+    file: /etc/magnus/secrets/postgres-bootstrap-password
+  app_database_password:
+    file: /etc/magnus/secrets/app-database-password
+  admin_password_hash:
+    file: /etc/magnus/secrets/admin-password-hash

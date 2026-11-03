@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- A single content card -->
+<article th:fragment="card(card)" class="card">
+    <a class="card-link" th:href="${card.type.name() == 'PHOTO' ? '/photos/' + card.slug :
+            (card.type.name() == 'BLOG' ? '/blog/' + card.slug :
+            (card.type.name() == 'FOOD' ? '/life/food/' + card.slug : '/life/travel/' + card.slug))}">
+        <div class="card-cover" th:if="${card.coverThumbUrl != null}">
+            <img th:src="${card.coverThumbUrl}" th:alt="${card.title}" loading="lazy">
+        </div>
+        <div class="card-body">
+            <h3 class="card-title" th:text="${card.title}">标题</h3>
+            <p class="card-summary" th:if="${card.summary != null}" th:text="${card.summary}"></p>
+            <div class="card-meta">
+                <time th:if="${card.publishedAt != null}" th:text="${@fmt.date(card.publishedAt)}"></time>
+                <span class="chip" th:if="${card.category != null}" th:text="${card.category}"></span>
+                <span class="chip chip-tag" th:each="t : ${card.tags}" th:text="${t}"></span>
+            </div>
+        </div>
+    </a>
+</article>
+
+<!-- Grid of cards + empty state -->
+<section th:fragment="cardGrid(cards, emptyText)" class="card-section">
+    <div class="card-grid" th:if="${!#lists.isEmpty(cards)}">
+        <th:block th:each="card : ${cards}">
+            <article th:replace="~{fragments/cards :: card(${card})}"></article>
+        </th:block>
+    </div>
+    <p class="empty-state" th:if="${#lists.isEmpty(cards)}" th:text="${emptyText}">暂无内容</p>
+</section>
+
+</body>
+</html>

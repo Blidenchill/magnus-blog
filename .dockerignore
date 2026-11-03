@@ -1,0 +1,10 @@
+.git
+docs
+deploy
+data
+target
+*.md
+.env
+.env.*
+!mvnw
+!.mvn

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/admin-layout :: layout(~{::title}, ~{::section}, ~{})}">
+<head>
+    <meta charset="UTF-8">
+    <title>概览 · Magnus 后台</title>
+</head>
+<body>
+<section>
+    <h1>概览</h1>
+    <div class="stat-grid">
+        <div class="stat-tile"><span class="stat-num" th:text="${publishedCount}">0</span><span>已发布</span></div>
+        <div class="stat-tile"><span class="stat-num" th:text="${draftCount}">0</span><span>草稿</span></div>
+        <div class="stat-tile"><span class="stat-num" th:text="${trashCount}">0</span><span>回收站</span></div>
+        <div class="stat-tile"><span class="stat-num" th:text="${mediaCount}">0</span><span>图片</span></div>
+    </div>
+    <p><a class="btn btn-primary" th:href="@{/admin/contents/new}">＋ 新建内容</a></p>
+</section>
+</body>
+</html>

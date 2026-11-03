@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${status} + ' · 出错了'">出错了</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<main class="wrap error-page">
+    <h1 th:text="${status}">错误</h1>
+    <p th:text="${message}">出错了</p>
+    <ul th:if="${fieldErrors != null and !fieldErrors.isEmpty()}">
+        <li th:each="e : ${fieldErrors}" th:text="${e.value}"></li>
+    </ul>
+    <p class="muted">请求编号：<code th:text="${requestId}">-</code></p>
+    <p><a th:href="@{/}">返回首页</a></p>
+</main>
+</body>
+</html>

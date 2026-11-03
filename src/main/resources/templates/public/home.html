@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${profile.name != null and !profile.name.isBlank()} ? ${profile.name} + ' 的主页' : '主页'">主页</title>
+</head>
+<body>
+<section>
+    <header class="profile-hero">
+        <img th:if="${avatarUrl != null}" th:src="${avatarUrl}" alt="头像" class="avatar">
+        <div class="profile-text">
+            <p class="hero-greeting">✿ 欢迎来到我们的小家 ✿</p>
+            <h1 th:text="${profile.name != null and !profile.name.isBlank()} ? ${profile.name} : '董小姐&赵先森和他们的珩宝宝'">名字</h1>
+            <p class="bio" th:if="${profile.bio != null}" th:text="${profile.bio}"></p>
+            <p class="contact" th:if="${profile.contact != null}" th:text="${profile.contact}"></p>
+        </div>
+    </header>
+
+    <section class="home-section sec-photos" th:if="${!#lists.isEmpty(photos)}">
+        <h2><a th:href="@{/photos}">精彩瞬间</a></h2>
+        <div th:replace="~{fragments/cards :: cardGrid(${photos}, '还没有公开的相册')}"></div>
+    </section>
+
+    <section class="home-section sec-blogs" th:if="${!#lists.isEmpty(blogs)}">
+        <h2><a th:href="@{/blog}">记录生活</a></h2>
+        <div th:replace="~{fragments/cards :: cardGrid(${blogs}, '还没有公开的文章')}"></div>
+    </section>
+
+    <section class="home-section sec-foods" th:if="${!#lists.isEmpty(foods)}">
+        <h2><a th:href="@{/life/food}">美食菜谱</a></h2>
+        <div th:replace="~{fragments/cards :: cardGrid(${foods}, '还没有公开的菜谱')}"></div>
+    </section>
+
+    <section class="home-section sec-travels" th:if="${!#lists.isEmpty(travels)}">
+        <h2><a th:href="@{/life/travel}">旅行足迹</a></h2>
+        <div th:replace="~{fragments/cards :: cardGrid(${travels}, '还没有公开的旅行记录')}"></div>
+    </section>
+</section>
+</body>
+</html>

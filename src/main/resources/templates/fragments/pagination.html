@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="pager(page, base, extra)" class="pagination" aria-label="分页"
+     th:if="${page != null and page.totalPages > 1}">
+    <a th:if="${page.hasPrevious()}" rel="prev"
+       th:href="${base + '?page=' + (page.number - 1) + '&size=' + page.size + (extra ?: '')}">← 上一页</a>
+    <span class="page-indicator" th:text="|第 ${page.number + 1} / ${page.totalPages} 页|">1 / 1</span>
+    <a th:if="${page.hasNext()}" rel="next"
+       th:href="${base + '?page=' + (page.number + 1) + '&size=' + page.size + (extra ?: '')}">下一页 →</a>
+</nav>
+</body>
+</html>

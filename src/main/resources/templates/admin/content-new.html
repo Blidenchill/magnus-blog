@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/admin-layout :: layout(~{::title}, ~{::section}, ~{})}">
+<head>
+    <meta charset="UTF-8">
+    <title>新建内容 · Magnus 后台</title>
+</head>
+<body>
+<section>
+    <h1>新建内容</h1>
+    <p class="muted">选择要创建的内容类型。创建后类型不可更改。</p>
+    <form th:action="@{/admin/contents/new}" method="post" class="type-picker">
+        <div class="type-options">
+            <label class="type-option">
+                <input type="radio" name="type" value="PHOTO" required>
+                <span class="type-name">相册</span>
+                <span class="type-desc">一组照片与说明</span>
+            </label>
+            <label class="type-option">
+                <input type="radio" name="type" value="BLOG">
+                <span class="type-name">Blog</span>
+                <span class="type-desc">图文文章</span>
+            </label>
+            <label class="type-option">
+                <input type="radio" name="type" value="FOOD">
+                <span class="type-name">菜谱</span>
+                <span class="type-desc">食材与步骤</span>
+            </label>
+            <label class="type-option">
+                <input type="radio" name="type" value="TRAVEL">
+                <span class="type-name">旅行清单</span>
+                <span class="type-desc">多个景点与理由</span>
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary">创建草稿</button>
+    </form>
+</section>
+</body>
+</html>

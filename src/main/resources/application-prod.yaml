@@ -1,0 +1,13 @@
+# Production profile. Secrets come from configtree:/run/secrets/ files:
+#   spring.datasource.password      -> database password
+#   magnus_admin_password-hash      -> BCrypt hash of the admin password
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+
+logging:
+  level:
+    root: warn
+    com.hubc.magnusblog: info

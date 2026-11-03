@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>美食菜谱</title>
+</head>
+<body>
+<section>
+    <h1>美食菜谱</h1>
+    <div class="filter-bar" th:if="${tag != null or category != null}">
+        <span>筛选：</span>
+        <span class="chip chip-tag" th:if="${tag != null}" th:text="${tag}"></span>
+        <span class="chip" th:if="${category != null}" th:text="${category}"></span>
+        <a th:href="@{/life/food}">清除</a>
+    </div>
+    <div th:replace="~{fragments/cards :: cardGrid(${page.content}, '还没有公开的菜谱')}"></div>
+    <nav th:replace="~{fragments/pagination :: pager(${page}, '/life/food', ${(tag != null ? '&tag=' + tag : '') + (category != null ? '&category=' + category : '')})}"></nav>
+</section>
+</body>
+</html>

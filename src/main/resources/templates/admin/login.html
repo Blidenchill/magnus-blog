@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <title>登录 · Magnus 后台</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin login-page">
+<main class="login-box">
+    <h1>Magnus 后台</h1>
+    <div th:if="${param.error != null}" class="flash flash-error">账号或密码不正确，或尝试次数过多，请稍后再试。</div>
+    <div th:if="${param.logout != null}" class="flash flash-ok">已安全退出。</div>
+    <form th:action="@{/admin/login}" method="post">
+        <label for="username">用户名</label>
+        <input type="text" id="username" name="username" autocomplete="username" required autofocus>
+        <label for="password">密码</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+        <button type="submit" class="btn btn-primary btn-block">登录</button>
+    </form>
+</main>
+</body>
+</html>

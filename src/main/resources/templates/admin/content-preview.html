@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title th:text="'预览 · ' + (${content.title} ?: '未命名')">预览</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>.preview-banner{position:sticky;top:0;background:#d97a29;color:#fff;padding:.5rem 1rem;text-align:center;font-size:.9rem;z-index:10}</style>
+</head>
+<body>
+<div class="preview-banner">预览模式：这是草稿内容，未公开发布。图片来自受保护的后台地址。</div>
+<main id="main" class="wrap">
+    <section class="detail-page">
+        <header th:replace="~{fragments/content-detail :: detailHeader(${content})}"></header>
+        <section th:if="${content.type.name() == 'PHOTO'}"
+                 th:replace="~{fragments/content-detail :: photoBody(${content})}"></section>
+        <article th:if="${content.type.name() == 'BLOG'}"
+                 th:replace="~{fragments/content-detail :: blogBody(${content})}"></article>
+        <section th:if="${content.type.name() == 'FOOD'}"
+                 th:replace="~{fragments/content-detail :: foodBody(${content})}"></section>
+        <section th:if="${content.type.name() == 'TRAVEL'}"
+                 th:replace="~{fragments/content-detail :: travelBody(${content})}"></section>
+    </section>
+</main>
+</body>
+</html>

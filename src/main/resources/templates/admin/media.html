@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN" th:replace="~{fragments/admin-layout :: layout(~{::title}, ~{::section}, ~{})}">
+<head>
+    <meta charset="UTF-8">
+    <title>图片管理 · Magnus 后台</title>
+</head>
+<body>
+<section>
+    <div class="admin-page-head">
+        <h1>图片管理</h1>
+        <label class="btn btn-primary upload-btn">
+            上传图片
+            <input type="file" id="media-upload-input" accept="image/jpeg,image/png" multiple hidden>
+        </label>
+    </div>
+    <p class="muted">仅支持 JPEG / PNG，单张不超过 10 MB。被内容引用的图片不能直接删除。</p>
+    <div id="upload-status" class="muted" role="status" aria-live="polite"></div>
+
+    <div class="media-grid" th:if="${!#lists.isEmpty(page.content)}">
+        <figure class="media-cell" th:each="asset : ${page.content}">
+            <img th:src="${thumbs.get(asset.id)}" th:alt="${asset.filename}" loading="lazy">
+            <figcaption>
+                <span class="media-name" th:title="${asset.filename}"
+                      th:text="${asset.filename.length() > 24 ? asset.filename.substring(0, 24) + '…' : asset.filename}"></span>
+                <span class="muted" th:text="|${asset.width}×${asset.height}|"></span>
+                <form th:action="@{/admin/media/{id}/delete(id=${asset.id})}" method="post"
+                      data-confirm="删除后无法恢复，确认删除该图片？" class="inline-form">
+                    <button type="submit" class="btn btn-quiet">删除</button>
+                </form>
+            </figcaption>
+        </figure>
+    </div>
+    <p class="empty-state" th:if="${#lists.isEmpty(page.content)}">还没有上传过图片。</p>
+    <nav th:replace="~{fragments/pagination :: pager(${page}, '/admin/media', '')}"></nav>
+    <script th:src="@{/js/upload.js}"></script>
+    <script th:src="@{/js/media-page.js}"></script>
+</section>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html th:fragment="layout(title, bodyContent, headExtra)" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title th:replace="${title}">管理后台</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <th:block th:replace="${headExtra}"></th:block>
+</head>
+<body class="admin">
+<div class="admin-shell">
+    <aside class="admin-sidebar">
+        <a class="admin-brand" th:href="@{/admin/dashboard}">Magnus 后台</a>
+        <nav class="admin-nav" aria-label="后台导航">
+            <a th:href="@{/admin/dashboard}">概览</a>
+            <a th:href="@{/admin/contents}">内容管理</a>
+            <a th:href="@{/admin/contents/new}">新建内容</a>
+            <a th:href="@{/admin/media}">图片管理</a>
+            <a th:href="@{/admin/trash}">回收站</a>
+            <a th:href="@{/admin/settings}">个人资料</a>
+            <a th:href="@{/}" target="_blank" rel="noopener">查看网站 ↗</a>
+        </nav>
+        <form th:action="@{/admin/logout}" method="post" class="logout-form">
+            <button type="submit" class="btn btn-quiet">退出登录</button>
+        </form>
+    </aside>
+    <main class="admin-main">
+        <div th:if="${saved}" class="flash flash-ok">已保存。</div>
+        <div th:if="${published}" class="flash flash-ok">已发布，公开页面已更新。</div>
+        <div th:if="${unpublished}" class="flash flash-ok">已撤回，访客将无法访问。</div>
+        <div th:if="${trashed}" class="flash flash-ok">已放入回收站。</div>
+        <div th:if="${restored}" class="flash flash-ok">已恢复为草稿。</div>
+        <div th:if="${deleted}" class="flash flash-ok">已删除。</div>
+        <div th:if="${error}" class="flash flash-error" th:text="${error}"></div>
+        <th:block th:replace="${bodyContent}"></th:block>
+    </main>
+</div>
+<script th:src="@{/js/forms.js}" defer></script>
+</body>
+</html>
