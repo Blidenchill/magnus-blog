@@ -97,12 +97,12 @@ docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml up -d
 ## 4. 验证
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/            # 200
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/admin/login # 200
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost/            # 200
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost/admin/login # 200
 docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml logs --tail 50 app
 ```
 
-浏览器打开 http://localhost:8080 ；后台 http://localhost:8080/admin/login ，
+浏览器打开 http://localhost ；后台 http://localhost/admin/login ，
 用户名 `admin`，密码为上一步散列对应的明文（本机约定 `test-password`）。
 
 ## 5. 日常操作
@@ -139,19 +139,19 @@ docker rmi magnus-blog:0.1.0
 | 项 | 本机（compose.local.yaml） | 生产（compose.yaml） |
 |---|---|---|
 | secret 位置 | `~/.magnus-local/secrets/` | `/etc/magnus/secrets/`（configtree） |
-| 反向代理 | 无，应用直接暴露 8080 | nginx 终结 TLS，80/443 |
-| 访问方式 | http://localhost:8080 | https:// 域名 |
+| 反向代理 | 无，应用直接暴露 80（容器内仍 8080） | nginx 终结 TLS，80/443 |
+| 访问方式 | http://localhost | https:// 域名 |
 | Cookie Secure | 关闭（http 直测需要） | 开启 |
 | 管理员密码 | 本机约定弱密码 | 强密码散列，成本 ≥ 12 |
 | 数据目录 | `~/.magnus-local/data` | `/srv/magnus`（独立数据盘） |
 
 ## 8. 故障排查
 
-- **8080 被占用**：`lsof -nP -iTCP:8080 -sTCP:LISTEN` 找到进程停掉
-  （常见是本地 `local-dev.sh app` 还在跑）。
+- **80 被占用**：`lsof -nP -iTCP:80 -sTCP:LISTEN` 找到进程停掉
+  （本地 `local-dev.sh app` 用的是 8080，与 Docker 的 80 不冲突，可并存）。
 - **app 一直重启、日志报数据库认证失败**：检查 1.3 的散列/密码文件是否带换行；
   或 3.3 的角色初始化没执行。
-- **登录总是跳回登录页**：确认用的是 http://localhost:8080 而不是 https；
+- **登录总是跳回登录页**：确认用的是 http://localhost 而不是 https；
   `SESSION_COOKIE_SECURE=false` 只应出现在本机覆盖文件里。
 - **init-app-role.sql 重复执行报错**：脚本本身幂等；若报语法错误，确认 `-v app_password=...`
   参数在 `-f -` 之前。

@@ -16,6 +16,6 @@ services:
   app:
     environment:
       SESSION_COOKIE_SECURE: "false"          # 仅本机 http 直测；生产必须为 true
-      APP_SITE_BASE_URL: http://localhost:8080
+      APP_SITE_BASE_URL: http://localhost
     ports:
-      - "8080:8080"                            # 本机不经 nginx，直接暴露应用
+      - "80:8080"                              # 宿主 80 → 容器 8080（本机不经 nginx）
