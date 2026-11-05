@@ -1,0 +1,21 @@
+# 本机 Docker 测试覆盖文件（与 compose.yaml 叠加，仅供本机，勿用于生产）：
+#   docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml up -d db app
+# 差异：secret 指向 ~/.magnus-local（免 sudo）、不跑 nginx/TLS、应用直接暴露 8080、
+# 关闭 cookie secure（本机 http 直测）。完整说明见 docs/docker-local.md。
+name: magnus
+
+secrets:
+  postgres_bootstrap_password:
+    file: ${HOME}/.magnus-local/secrets/postgres-bootstrap-password
+  app_database_password:
+    file: ${HOME}/.magnus-local/secrets/app-database-password
+  admin_password_hash:
+    file: ${HOME}/.magnus-local/secrets/admin-password-hash
+
+services:
+  app:
+    environment:
+      SESSION_COOKIE_SECURE: "false"          # 仅本机 http 直测；生产必须为 true
+      APP_SITE_BASE_URL: http://localhost:8080
+    ports:
+      - "8080:8080"                            # 本机不经 nginx，直接暴露应用

@@ -3,8 +3,7 @@
 --   docker compose exec -T db psql -U postgres -d magnus \
 --       -v app_password="$(cat /etc/magnus/secrets/app-database-password)" \
 --       -f - < deploy/init-app-role.sql
--- psql variable interpolation:
-\set app_password `cat /run/secrets/app_database_password 2>/dev/null || echo "$APP_DB_PASSWORD"`
+-- Idempotent: safe to re-run; re-running refreshes the role password.
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'magnus') THEN

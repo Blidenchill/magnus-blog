@@ -26,6 +26,10 @@ createdb magnus
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
+**方式三：本机 Docker（验证生产部署形态）**
+
+见 [docs/docker-local.md](docs/docker-local.md)：镜像制作、密钥初始化、compose 启动全流程。
+
 本地 profile（`application-local.yaml`）默认：
 
 - 数据库 `jdbc:postgresql://localhost:5432/magnus`，用户/密码 `magnus`/`magnus`（可用 `LOCAL_DB_PASSWORD` 覆盖）

@@ -1,2 +1,10 @@
 /.mvn/
 /.idea/
+/target/
+/data/
+.env
+.env.local
+*.iml
+.DS_Store
+/tests/e2e/node_modules/
+/tests/e2e/test-results/
