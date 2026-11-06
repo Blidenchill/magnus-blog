@@ -1,8 +1,20 @@
-/* Magnus Blog — public site. Warm family-home theme:
-   cream paper background with soft polka dots, terracotta / honey / sage /
-   dusty-rose accents, serif display headings, hand-drawn style dashed and
-   wavy lines, scrapbook cards with washi-tape detail. Max width 1120px;
-   articles 720px. All decoration is pure CSS (CSP: img-src 'self'). */
+/* 拾光小筑 — public site. Warm family-home theme:
+   cream paper background with soft polka dots, coral / honey / sage /
+   dusty-rose accents, rounded display headings (自托管阿里妈妈方圆体子集),
+   hand-drawn SVG doodles, polaroid cards with washi-tape detail.
+   Max width 1120px; articles 720px.
+   All decoration is pure CSS / inline SVG (CSP: img-src 'self', font-src 'self'). */
+
+/* 阿里妈妈方圆体：可变字体实例化到 wght=600 后子集化（GB2312 一级字库 +
+   ASCII + 常用标点 + 站点文案，约 3884 字形）。仅作标题/展示字体。 */
+@font-face {
+    font-family: "AlimamaFangYuan";
+    src: url("/fonts/AlimamaFangYuan-600.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --color-text: #4a3f36;          /* 暖棕黑 */
     --color-muted: #97826f;         /* 暖灰棕 */
@@ -10,16 +22,21 @@
     --color-bg-soft: #f7eee1;       /* 深一点的奶油 */
     --color-card: #fffdf9;          /* 卡片白 */
     --color-border: #ecdcc8;        /* 暖沙色线条 */
-    --color-accent: #c96f4a;        /* 赤陶 */
-    --color-accent-deep: #b05a37;   /* 深赤陶（hover） */
+    --color-accent: #d4715d;        /* 珊瑚粉（主色） */
+    --color-accent-deep: #bd5a45;   /* 深珊瑚（hover） */
     --color-honey: #dfa050;         /* 蜂蜜 */
     --color-sage: #7d9b76;          /* 鼠尾草绿 */
     --color-rose: #d38f8f;          /* 灰玫瑰 */
     --shadow-warm: 0 2px 6px rgba(146, 112, 79, .08), 0 10px 26px rgba(146, 112, 79, .07);
     --shadow-lift: 0 6px 14px rgba(146, 112, 79, .14), 0 18px 44px rgba(146, 112, 79, .13);
-    --font-body: "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-    --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+    /* 正文优先圆体（macOS/iOS 圆体、Windows 幼圆），衬线兜底 */
+    --font-body: "Yuanti SC", "YouYuan", "幼圆", "PingFang SC", "Microsoft YaHei", sans-serif;
+    /* 标题用自托管方圆体，保持圆润的手账感 */
+    --font-display: "AlimamaFangYuan", "Yuanti SC", "YouYuan", "幼圆", "PingFang SC", sans-serif;
 }
+
+/* 方圆体只内嵌了 600 一个字重：标题统一显式 600，避免浏览器再合成加粗 */
+h1, h2, h3, h4 { font-weight: 600; }
 
 * { box-sizing: border-box; }
 
@@ -31,7 +48,7 @@ body {
     color: var(--color-text);
     background-color: var(--color-bg);
     /* 极淡的圆点纸纹，像手账内页 */
-    background-image: radial-gradient(rgba(201, 111, 74, .055) 1.1px, transparent 1.1px);
+    background-image: radial-gradient(rgba(212, 113, 93, .055) 1.1px, transparent 1.1px);
     background-size: 22px 22px;
     line-height: 1.7;
 }
@@ -57,7 +74,7 @@ img { max-width: 100%; height: auto; }
 }
 .skip-link:focus { left: 0; }
 
-a { color: var(--color-accent); text-decoration-color: rgba(201, 111, 74, .4); }
+a { color: var(--color-accent); text-decoration-color: rgba(212, 113, 93, .4); }
 a:hover { color: var(--color-accent-deep); }
 
 :focus-visible { outline: 2px solid var(--color-honey); outline-offset: 2px; }
@@ -86,18 +103,22 @@ a:hover { color: var(--color-accent-deep); }
     min-height: 58px;
 }
 .site-title {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
     font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1.45rem;
+    font-weight: 600;
     color: var(--color-text);
     text-decoration: none;
-    letter-spacing: .02em;
+    letter-spacing: .06em;
 }
-.site-title::before {
-    content: "❀";
+/* 小房子 logo：珊瑚色描线，怀里揣着一颗爱心 */
+.site-logo {
+    width: 1.55rem;
+    height: 1.55rem;
     color: var(--color-accent);
-    margin-right: .35rem;
-    font-size: 1.1em;
+    flex-shrink: 0;
 }
 .site-nav {
     display: flex;
@@ -193,6 +214,17 @@ a:hover { color: var(--color-accent-deep); }
     z-index: 1;
 }
 .profile-text { position: relative; z-index: 1; }
+/* hero 右下角的手绘小房子插画（内联 SVG，aria-hidden） */
+.hero-doodle {
+    position: absolute;
+    right: 1.6rem;
+    bottom: .7rem;
+    width: 205px;
+    height: auto;
+    z-index: 0;
+    opacity: .85;
+    pointer-events: none;
+}
 .hero-greeting {
     font-family: var(--font-display);
     color: var(--color-accent);
@@ -226,9 +258,12 @@ a:hover { color: var(--color-accent-deep); }
     /* 虚线分隔，代替生硬的实线 */
     border-bottom: 2px dashed var(--color-border);
 }
-.home-section h2::before {
-    content: "✦";
-    font-size: .85em;
+/* 板块标题前的手绘小图标（相机/铅笔/碗/纸飞机），颜色跟随板块主题色 */
+.sec-icon {
+    width: 1.3em;
+    height: 1.3em;
+    align-self: center;
+    flex-shrink: 0;
     color: var(--sec-accent, var(--color-accent));
 }
 .home-section h2 a {
@@ -255,7 +290,7 @@ a:hover { color: var(--color-accent-deep); }
 .sec-foods   { --sec-accent: var(--color-honey); }
 .sec-travels { --sec-accent: var(--color-sage); }
 
-/* 列表页大标题：衬线 + 手绘波浪线，与详情页风格一致 */
+/* 列表页大标题：圆润展示字体 + 手绘波浪线，与详情页风格一致 */
 main h1 {
     font-family: var(--font-display);
     text-decoration: underline wavy var(--color-border) 2.5px;
@@ -280,24 +315,39 @@ main h1 {
     box-shadow: var(--shadow-warm);
     transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
-/* 拍立得式悬浮：轻轻抬起并歪一点 */
+/* 拍立得式悬浮：轻轻抬起（保持自身倾斜角度，像拈起一张照片） */
 .card-link:hover {
-    transform: translateY(-4px) rotate(-.5deg);
+    transform: translateY(-5px);
     box-shadow: var(--shadow-lift);
     border-color: var(--color-honey);
 }
-.card-cover { position: relative; }
-.card-cover img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
-/* 封面上方的和纸胶带 */
+/* 整列照片微微交错倾斜，像随手钉在软木板上 */
+.card-grid > .card:nth-child(3n+1) { transform: rotate(-1.1deg); }
+.card-grid > .card:nth-child(3n+2) { transform: rotate(.7deg); }
+.card-grid > .card:nth-child(3n)   { transform: rotate(-.5deg); }
+/* 拍立得白边相框：四周一圈白，下边更宽 */
+.card-cover {
+    position: relative;
+    background: #fff;
+    padding: 9px 9px 26px;
+}
+.card-cover img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    border-radius: 2px;
+}
+/* 左上角斜贴的和纸胶带 */
 .card-cover::after {
     content: "";
     position: absolute;
-    top: 10px;
-    left: 50%;
-    width: 86px;
-    height: 22px;
-    transform: translateX(-50%) rotate(-3deg);
-    background: rgba(223, 160, 80, .42);
+    top: -2px;
+    left: 16px;
+    width: 72px;
+    height: 20px;
+    transform: rotate(-42deg);
+    background: rgba(223, 160, 80, .45);
     border-left: 2px dashed rgba(255, 255, 255, .7);
     border-right: 2px dashed rgba(255, 255, 255, .7);
     box-shadow: 0 1px 3px rgba(146, 112, 79, .18);
@@ -376,10 +426,27 @@ main h1 {
     color: var(--color-muted);
 }
 
-.photo-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1.2rem; }
-.photo-list figure { margin: 0; }
-.photo-list img { border-radius: 12px; box-shadow: var(--shadow-warm); }
-.photo-list figcaption { color: var(--color-muted); font-size: .9rem; padding-top: .35rem; }
+.photo-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1.6rem; }
+/* 详情页照片也装进拍立得相框，左右交替微倾 */
+.photo-list figure {
+    margin: 0;
+    background: #fff;
+    padding: 12px 12px 8px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-warm);
+    transform: rotate(-.8deg);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.photo-list li:nth-child(even) figure { transform: rotate(.9deg); }
+.photo-list figure:hover { transform: rotate(0); box-shadow: var(--shadow-lift); }
+.photo-list img { border-radius: 3px; display: block; }
+.photo-list figcaption {
+    color: var(--color-muted);
+    font-size: .92rem;
+    font-family: var(--font-display);
+    text-align: center;
+    padding-top: .55rem;
+}
 
 .ingredient-list {
     list-style: none;
@@ -525,7 +592,9 @@ main h1 {
     }
     body.nav-open .site-nav { display: flex; }
     .header-inner { flex-wrap: wrap; }
-    .profile-hero { flex-direction: column; text-align: center; padding: 1.8rem 1.2rem; }
+    .profile-hero { flex-direction: column; text-align: center; padding: 1.8rem 1.2rem 1.4rem; }
+    /* 小屏幕上插画从角落移到文字下方，避免压住名字 */
+    .hero-doodle { position: static; width: 165px; margin: 1rem auto 0; }
     .card-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 400px) {
@@ -536,5 +605,5 @@ main h1 {
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { transition: none !important; }
-    .card-link:hover, .avatar { transform: none; }
+    .card-link:hover, .avatar, .card-grid > .card, .photo-list figure { transform: none; }
 }

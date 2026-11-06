@@ -2,11 +2,11 @@
 <html lang="zh-CN" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
 <head>
     <meta charset="UTF-8">
-    <title>Blog</title>
+    <title>博客</title>
 </head>
 <body>
 <section>
-    <h1>Blog</h1>
+    <h1>博客</h1>
     <div class="filter-bar" th:if="${tag != null}">
         <span>标签筛选：</span><span class="chip chip-tag" th:text="${tag}"></span>
         <a th:href="@{/blog}">清除</a>

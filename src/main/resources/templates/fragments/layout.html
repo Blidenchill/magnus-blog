@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:replace="${title}">Magnus Blog</title>
+    <title th:replace="${title}">拾光小筑</title>
     <meta name="description" th:content="${pageDescription} ?: '个人主页：照片、博客、美食与旅行'">
+    <link rel="preload" th:href="@{/fonts/AlimamaFangYuan-600.woff2}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
 <a class="skip-link" href="#main">跳到正文</a>
 <header class="site-header">
     <div class="wrap header-inner">
-        <a class="site-title" th:href="@{/}">Magnus</a>
+        <a class="site-title" th:href="@{/}"><svg class="site-logo" viewBox="0 0 48 48" fill="none"
+                stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path
+                d="M7 25 L24 10 L41 25"/><path d="M12 22 v16 h24 V22"/><path
+                d="M24 37 c-4 -3 -6 -4.8 -6 -7 a3.2 3.2 0 0 1 6 -0.6 a3.2 3.2 0 0 1 6 0.6 c0 2.2 -2 4 -6 7 z"
+                fill="currentColor" stroke="none"/></svg>拾光小筑</a>
         <button class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false"
                 id="nav-toggle">☰</button>
         <nav class="site-nav" aria-label="主导航">
             <a th:href="@{/}">主页</a>
             <a th:href="@{/photos}">相册</a>
-            <a th:href="@{/blog}">Blog</a>
+            <a th:href="@{/blog}">博客</a>
             <a th:href="@{/life/food}">美食</a>
             <a th:href="@{/life/travel}">旅行</a>
             <form class="nav-search" th:action="@{/search}" method="get" role="search">
@@ -31,7 +36,7 @@
 </main>
 <footer class="site-footer">
     <div class="wrap">
-        <p>© Magnus · 用 <span class="accent">照片与文字</span> 记录生活</p>
+        <p>© 拾光小筑 · 用 <span class="accent">照片与文字</span> 记录生活</p>
     </div>
 </footer>
 <script th:src="@{/js/lightbox.js}" defer></script>

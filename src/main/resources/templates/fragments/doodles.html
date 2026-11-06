@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 首页 hero 手绘插画：小房子 + 太阳 + 云朵 + 爱心炊烟。
+     内联 SVG，stroke 引用 CSS 变量，随主题色走；纯装饰，对读屏隐藏。 -->
+<svg th:fragment="heroHouse" class="hero-doodle" viewBox="0 0 220 160" fill="none"
+     stroke="var(--color-accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true">
+    <!-- 太阳：圆 + 虚线环当光芒 -->
+    <circle cx="184" cy="30" r="12" stroke="var(--color-honey)"/>
+    <circle cx="184" cy="30" r="19" stroke="var(--color-honey)" stroke-dasharray="0.5 8"/>
+    <!-- 云朵 -->
+    <path d="M28 44 a8 8 0 0 1 4 -15 a10 10 0 0 1 18 -4 a8 8 0 0 1 14 5 a7 7 0 0 1 -2 14 z"
+          stroke="var(--color-sage)"/>
+    <!-- 小房子 -->
+    <path d="M68 102 v42 h84 v-42"/>
+    <path d="M56 104 L110 54 L164 104"/>
+    <path d="M134 82 v-16 h12 v23"/>
+    <!-- 拱形门 -->
+    <path d="M99 144 v-20 a11 11 0 0 1 22 0 v20"/>
+    <!-- 圆窗 -->
+    <circle cx="82" cy="119" r="7"/>
+    <path d="M75 119 h14 M82 112 v14"/>
+    <!-- 烟囱飘出的爱心 -->
+    <path d="M140 56 c-4 -3.5 -6.5 -5.5 -6.5 -8 a3.5 3.5 0 0 1 6.5 -0.7 a3.5 3.5 0 0 1 6.5 0.7 c0 2.5 -2.5 4.5 -6.5 8 z"
+          fill="var(--color-rose)" stroke="none"/>
+    <path d="M154 40 c-2.7 -2.3 -4.3 -3.7 -4.3 -5.3 a2.3 2.3 0 0 1 4.3 -0.5 a2.3 2.3 0 0 1 4.3 0.5 c0 1.7 -1.6 3 -4.3 5.3 z"
+          fill="var(--color-rose)" stroke="none" opacity=".75"/>
+    <!-- 地面虚线 -->
+    <path d="M14 152 h192" stroke="var(--color-border)" stroke-dasharray="3 9"/>
+    <!-- 墙角小花 -->
+    <path d="M30 152 v-9" stroke="var(--color-sage)"/>
+    <g fill="var(--color-rose)" stroke="none">
+        <circle cx="30" cy="140" r="2.4"/>
+        <circle cx="30" cy="134.8" r="2"/>
+        <circle cx="30" cy="145.2" r="2"/>
+        <circle cx="25.2" cy="140" r="2"/>
+        <circle cx="34.8" cy="140" r="2"/>
+    </g>
+    <path d="M192 152 v-8" stroke="var(--color-sage)"/>
+    <g fill="var(--color-honey)" stroke="none">
+        <circle cx="192" cy="141" r="2.2"/>
+        <circle cx="192" cy="136.4" r="1.8"/>
+        <circle cx="192" cy="145.6" r="1.8"/>
+        <circle cx="187.4" cy="141" r="1.8"/>
+        <circle cx="196.6" cy="141" r="1.8"/>
+    </g>
+    <!-- 小星星 -->
+    <path d="M44 76 v10 M39 81 h10" stroke="var(--color-honey)"/>
+    <path d="M172 66 v8 M168 70 h8" stroke="var(--color-rose)"/>
+</svg>
+
+<!-- 板块图标：相机（相册） -->
+<svg th:fragment="iconCamera" class="sec-icon" viewBox="0 0 48 48" fill="none"
+     stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="7" y="15" width="34" height="24" rx="5"/>
+    <path d="M17 15 l3 -5.5 h8 l3 5.5"/>
+    <circle cx="24" cy="27" r="7"/>
+    <circle cx="24" cy="27" r="2.4"/>
+    <circle cx="35.5" cy="20.5" r="1" fill="currentColor" stroke="none"/>
+</svg>
+
+<!-- 板块图标：铅笔（博客） -->
+<svg th:fragment="iconPencil" class="sec-icon" viewBox="0 0 48 48" fill="none"
+     stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <g transform="rotate(-45 24 24)">
+        <path d="M8 24 L14 18.5 h20 v11 H14 Z"/>
+        <path d="M31 18.5 v11 M34.5 18.5 v11"/>
+        <path d="M38 18.5 a5.5 5.5 0 0 1 0 11"/>
+        <path d="M8 24 l6 -2.5 M8 24 l6 2.5" stroke-width="2"/>
+    </g>
+</svg>
+
+<!-- 板块图标：带热气的碗（美食） -->
+<svg th:fragment="iconBowl" class="sec-icon" viewBox="0 0 48 48" fill="none"
+     stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M7 24 h34"/>
+    <path d="M9.5 24 c0 9 5.5 14.5 14.5 14.5 s14.5 -5.5 14.5 -14.5"/>
+    <path d="M19 42.5 h10"/>
+    <path d="M18 17 c-1.5 -2 -1.5 -4 0 -6 M25 17 c-1.5 -2 -1.5 -4 0 -6 M32 17 c-1.5 -2 -1.5 -4 0 -6"/>
+</svg>
+
+<!-- 板块图标：纸飞机（旅行） -->
+<svg th:fragment="iconPlane" class="sec-icon" viewBox="0 0 48 48" fill="none"
+     stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M7 26 L42 8 L28 42 L21 30 Z"/>
+    <path d="M21 30 L42 8"/>
+    <path d="M5 40 a11 11 0 0 0 11 3" stroke-dasharray="1.5 5"/>
+</svg>
+
+</body>
+</html>

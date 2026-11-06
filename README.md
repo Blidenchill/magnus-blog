@@ -46,7 +46,8 @@ createdb magnus
 ## 生产部署（概要）
 
 1. 构建镜像：`docker build -t registry.example.com/magnus-blog:0.1.0 .`
-2. 准备数据盘：`/srv/magnus/{postgres,app-data}`（先挂载磁盘再建目录）。
+2. 准备数据盘：`/srv/magnus/{postgres,app-data}`（先挂载磁盘再建目录）；
+   应用容器以 uid 10001 非 root 运行，`app-data` 需要授权：`sudo chown -R 10001:10001 /srv/magnus/app-data`。
 3. 准备 secret（`/etc/magnus/secrets/`）：
    - `postgres-bootstrap-password`：postgres 超级用户密码
    - `app-database-password`：应用角色 `magnus` 的密码

@@ -181,6 +181,11 @@ docker rmi magnus-blog:0.1.0
   `SERVER_SERVLET_SESSION_COOKIE_SECURE=false`（优先级高于一切 yaml），
   `SESSION_COOKIE_SECURE` 这个占位符名在 prod 下不生效。该覆盖只应出现在本机/http 过渡期。
 - **登录页 403 但 cookie 正常**：登录页是应用重启前打开的，旧 CSRF token 已失效，刷新页面重试。
+- **上传图片报 422「图片处理失败」**：先看真实异常 `$COMPOSE logs app | grep -A 15 "media upload failed"`。
+  Linux 上最常见原因是 bind mount 属主：应用容器以 **uid 10001** 非 root 运行，
+  宿主机数据目录若是 root/普通用户创建，容器内无写权限。修复：
+  `sudo chown -R 10001:10001 <DATA_ROOT>/app-data`。
+  （macOS Docker Desktop 的文件共享层掩盖了这个问题，所以本机不现、服务器现。）
 - **init-app-role.sql 重复执行报错**：脚本本身幂等；若报语法错误，确认 `-v app_password=...`
   参数在 `-f -` 之前。
 - **看数据库内容**：`$COMPOSE exec db psql -U postgres -d magnus`。
@@ -203,3 +208,7 @@ $COMPOSE down               # 停止并删除容器（数据卷仍保留在 ~/.m
 
 ```bash
 docker build -t magnus-blog:0.1.0 . && $COMPOSE up -d app
+
+
+查看日志:
+docker logs magnus-app-1 2>&1 | tail -30
