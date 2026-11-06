@@ -34,7 +34,7 @@ public class GenHash {
 }
 EOF
 CP=$(echo ~/.m2/repository/org/springframework/security/spring-security-crypto/*/spring-security-crypto-*.jar):$(echo ~/.m2/repository/org/springframework/spring-jcl/*/spring-jcl-*.jar)
-printf '%s' "$(cd /tmp && "$JAVA_HOME/bin/java" -cp "$CP" GenHash.java 'test-password')" \
+printf '%s' "$(cd /tmp && "java" -cp "$CP" GenHash.java 'bydq0226')" \
     > ~/.magnus-local/secrets/admin-password-hash
 
 # 1.4 收紧权限
@@ -45,13 +45,15 @@ chmod 700 ~/.magnus-local/secrets && chmod 600 ~/.magnus-local/secrets/*
 > 应用经 configtree 原样读取文件内容；多一个 `\n` 会导致数据库认证失败、
 > 管理员密码校验永远不匹配。
 
-`compose.local.yaml` 引用上述 secret；`.env.local` 提供三个非机密参数
-（`DATA_ROOT` 需为绝对路径，`.env` 文件不会展开 `$HOME`）：
+`compose.local.yaml` 引用上述 secret；环境参数文件提供三个非机密参数
+（`DATA_ROOT` 需为绝对路径，`.env` 文件不会展开 `$HOME`）。
+本机用 `.env.local`，Linux 服务器上用 `.env.cloud`（上传到服务器或随 git 检出）：
 
-```
-DATA_ROOT=/Users/<你>/.magnus-local/data
-APP_IMAGE=magnus-blog:0.1.0
-APP_ADMIN_USERNAME=admin
+```ini
+# .env.local（本机 Mac）           # .env.cloud（Linux 服务器）
+DATA_ROOT=/Users/<你>/.magnus-local/data   DATA_ROOT=/home/admin/.magnus-local/data
+APP_IMAGE=magnus-blog:0.1.0        APP_IMAGE=magnus-blog:0.1.0
+APP_ADMIN_USERNAME=admin           APP_ADMIN_USERNAME=admin
 ```
 
 ## 2. 制作镜像
@@ -78,20 +80,22 @@ docker images magnus-blog        # 应看到 magnus-blog:0.1.0，约 350MB
 **顺序不可乱：先数据库 → 初始化应用角色 → 再起应用。**
 
 ```bash
+# 本机用 .env.local；在服务器上执行时把这里改成 .env.cloud，后面所有命令不变
+COMPOSE="docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml"
+
 # 3.1 启动数据库（首次会自动初始化数据目录）
-docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml up -d db
+$COMPOSE up -d db
 
 # 3.2 等数据库健康（STATUS 变为 healthy）
-docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml ps
+$COMPOSE ps
 
 # 3.3 创建应用角色 magnus（幂等，可重复执行；密码从 secret 文件注入，不出现在命令历史里）
-docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml exec -T db \
-    psql -U postgres -d magnus \
+$COMPOSE exec -T db psql -U postgres -d magnus \
     -v app_password="$(cat ~/.magnus-local/secrets/app-database-password)" \
     -f - < deploy/init-app-role.sql
 
 # 3.4 启动应用（Flyway 自动建表，首次约 20 秒）
-docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml up -d app
+$COMPOSE up -d app
 ```
 
 ## 4. 验证
@@ -99,7 +103,7 @@ docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml up -d
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost/            # 200
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost/admin/login # 200
-docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml logs --tail 50 app
+$COMPOSE logs --tail 50 app
 ```
 
 浏览器打开 http://localhost ；后台 http://localhost/admin/login ，
@@ -108,7 +112,7 @@ docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml logs 
 ## 5. 日常操作
 
 ```bash
-COMPOSE="docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml"
+COMPOSE="docker compose --env-file .env.local -f compose.yaml -f compose.local.yaml"  # 服务器上改 .env.cloud
 
 $COMPOSE ps                 # 状态
 $COMPOSE logs -f app        # 跟随应用日志
@@ -123,6 +127,26 @@ $COMPOSE down               # 停止并删除容器（数据卷仍保留在 ~/.m
 ```bash
 docker build -t magnus-blog:0.1.0 . && $COMPOSE up -d app
 ```
+
+### 更新管理员密码散列（本机/服务器通用）
+
+BCrypt 散列自带盐、与机器无关，可离线生成后 `scp` 上传。应用只在**启动时**读取散列
+（configtree 不热加载），且 compose secret 是文件 bind mount——所以必须原地覆盖文件
+再重建容器：
+
+1. 本地生成新散列（方法见 1.3，成本 ≥ 12）。写文件时**用单引号包裹散列**
+   （`$2a$12$…` 里的 `$` 在双引号下会被 shell 展开成乱码）、**不带尾随换行**
+   （`printf '%s'`，成品正好 60 字节）。
+2. 上传到服务器后**原地覆盖**（保持 inode，不要用 `mv`）：
+   `cat /tmp/admin-password-hash | sudo tee ~/.magnus-local/secrets/admin-password-hash >/dev/null`
+3. 重建应用容器：`$COMPOSE up -d --force-recreate app`
+   （`restart` 对原地覆盖够用；文件被 `mv` 换过 inode 时必须 force-recreate）
+4. 验证：`docker exec magnus-app-1 sh -c 'wc -c < /run/secrets/magnus_admin_password-hash'`
+   输出 60，再用新密码登录一次。
+
+时序注意：重建完成前旧密码仍有效（应用内存里是旧散列），重建后旧密码立即失效。
+数据库密码（`app-database-password`）轮换流程相同，另需在数据库里执行
+`ALTER ROLE magnus WITH PASSWORD '…'`（可用 3.3 的 init 脚本直接刷）。
 
 ## 6. 彻底重置 / 卸载
 

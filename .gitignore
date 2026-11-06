@@ -4,6 +4,7 @@
 /data/
 .env
 .env.local
+.env.cloud
 *.iml
 .DS_Store
 /tests/e2e/node_modules/

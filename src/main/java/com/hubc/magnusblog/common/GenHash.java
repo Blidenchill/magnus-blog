@@ -1,0 +1,8 @@
+package com.hubc.magnusblog.common;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+public class GenHash {
+    public static void main(String[] a) {
+        System.out.println(new BCryptPasswordEncoder(12).encode("bydq0226"));
+    }
+}
