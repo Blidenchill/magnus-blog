@@ -15,7 +15,11 @@ secrets:
 services:
   app:
     environment:
-      SESSION_COOKIE_SECURE: "false"          # 仅本机 http 直测；生产必须为 true
+      # 仅本机/http 过渡期使用；生产（https）必须为 true。
+      # 注意必须用 SERVER_SERVLET_SESSION_COOKIE_SECURE：application-prod.yaml 硬编码了
+      # secure: true（优先级高于基础 yaml 里的 ${SESSION_COOKIE_SECURE} 占位符），
+      # 而环境变量优先级又高于一切 yaml，所以这个名字才真正生效。
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: "false"
       APP_SITE_BASE_URL: http://localhost
     ports:
       - "80:8080"                              # 宿主 80 → 容器 8080（本机不经 nginx）

@@ -175,8 +175,12 @@ docker rmi magnus-blog:0.1.0
   （本地 `local-dev.sh app` 用的是 8080，与 Docker 的 80 不冲突，可并存）。
 - **app 一直重启、日志报数据库认证失败**：检查 1.3 的散列/密码文件是否带换行；
   或 3.3 的角色初始化没执行。
-- **登录总是跳回登录页**：确认用的是 http://localhost 而不是 https；
-  `SESSION_COOKIE_SECURE=false` 只应出现在本机覆盖文件里。
+- **登录 POST 返回 403 / 总是跳回登录页**：多半是 Cookie 带了 `Secure` 而被浏览器拒收。
+  用 `curl -sv http://localhost/admin/login 2>&1 | grep -i set-cookie` 确认。
+  注意 prod profile 硬编码了 `secure: true`，覆盖它必须用环境变量
+  `SERVER_SERVLET_SESSION_COOKIE_SECURE=false`（优先级高于一切 yaml），
+  `SESSION_COOKIE_SECURE` 这个占位符名在 prod 下不生效。该覆盖只应出现在本机/http 过渡期。
+- **登录页 403 但 cookie 正常**：登录页是应用重启前打开的，旧 CSRF token 已失效，刷新页面重试。
 - **init-app-role.sql 重复执行报错**：脚本本身幂等；若报语法错误，确认 `-v app_password=...`
   参数在 `-f -` 之前。
 - **看数据库内容**：`$COMPOSE exec db psql -U postgres -d magnus`。
