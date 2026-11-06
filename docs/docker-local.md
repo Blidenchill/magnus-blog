@@ -184,3 +184,22 @@ docker rmi magnus-blog:0.1.0
 - **init-app-role.sql 重复执行报错**：脚本本身幂等；若报语法错误，确认 `-v app_password=...`
   参数在 `-f -` 之前。
 - **看数据库内容**：`$COMPOSE exec db psql -U postgres -d magnus`。
+
+## 9. 重新部署: 
+docker compose --env-file .env.cloud -f compose.yaml -f compose.local.yaml up -d --force-recreate app
+
+```bash
+COMPOSE="docker compose --env-file .env.cloud -f compose.yaml -f compose.local.yaml"  # 服务器上改 .env.cloud
+
+$COMPOSE ps                 # 状态
+$COMPOSE logs -f app        # 跟随应用日志
+$COMPOSE restart app        # 重启应用
+$COMPOSE stop               # 停止（数据保留）
+$COMPOSE start              # 再启动
+$COMPOSE down               # 停止并删除容器（数据卷仍保留在 ~/.magnus-local/data）
+```
+
+代码改动后重新上线：
+
+```bash
+docker build -t magnus-blog:0.1.0 . && $COMPOSE up -d app
